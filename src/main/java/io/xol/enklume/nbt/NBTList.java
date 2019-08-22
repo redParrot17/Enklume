@@ -9,39 +9,41 @@ public class NBTList extends NBTNamed {
 	int type;
 	int number;
 	
-	public List<NBTNamed> elements = new ArrayList<NBTNamed>();
+	public List<NBTNamed> elements = new ArrayList<>();
 	
 	@Override
 	void feed(DataInputStream is) throws IOException {
 		super.feed(is);
 		type = is.read();
-		number = is.read() << 24;
-		number |= is.read() << 16;
-		number |= is.read() << 8;
-		number |= is.read();
-		if(type > 0)
-		{
-			for(int i = 0; i < number; i++)
-			{
+		number = is.readInt();
+		if(type > 0) {
+			for(int i = 0; i < number; i++) {
 				NBTag tag = NBTag.createNamedFromList(type, i);
-				
 				tag.feed(is);
 				elements.add((NBTNamed) tag);
 			}
+		} else if (number > 0) {
+			System.out.println("Warning : found an illegal NBTList of TAG_END !");
 		}
-		else
-		{
-			//System.out.println("Warning : found a NBTList of TAG_END !");
-		}
+	}
+
+	@Override
+	public String stringifyTag(int tabCount) {
+		StringBuilder sb = new StringBuilder();
+		for (int i=0;i<tabCount;i++) sb.append("\t");
+		sb.append("TAG_List(").append(list?"None":"'"+getName()+"'").append("): ").append(elements.size()).append(elements.size()==1?" entry\n":" entries\n");
+		for (int i=0;i<tabCount;i++) sb.append("\t");
+		sb.append("{\n");
+		elements.forEach(e -> sb.append(e.stringifyTag(tabCount+1)));
+		for (int i=0;i<tabCount;i++) sb.append("\t");
+		sb.append("}\n");
+		return sb.toString();
 	}
 	
 	//@Override
-	public NBTNamed getTag(String path)
-	{
-		if(path.startsWith("."))
-			path = path.substring(1);
-		if(path.equals(""))
-			return this;
+	public NBTNamed getTag(String path) {
+		if(path.startsWith(".")) path = path.substring(1);
+		if(path.equals("")) return this;
 		
 		String[] s = path.split("\\.");
 		String looking = s[0];
@@ -49,13 +51,11 @@ public class NBTList extends NBTNamed {
 		int index = Integer.parseInt(looking);
 		
 		//If this is within the list
-		if(index < elements.size())
-		{
+		if(index < elements.size()) {
 			NBTNamed found = elements.get(index);
 			
 			//There is still hierarchy to traverse
-			if(s.length > 1)
-			{
+			if(s.length > 1) {
 				String deeper = path.substring(looking.length() + 1);
 				
 				if(found instanceof NBTCompound)
@@ -66,8 +66,7 @@ public class NBTList extends NBTNamed {
 					System.out.println("error: Can't traverse tag "+found+"; not a Compound, nor a List tag.");
 			}
 			//There isn't
-			else
-				return found;
+			else return found;
 		}
 		
 		return null;

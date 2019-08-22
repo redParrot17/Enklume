@@ -2,29 +2,22 @@ package io.xol.enklume.nbt;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
-public class NBTNamed extends NBTag{
+public abstract class NBTNamed extends NBTag {
 
 	private String tagName;
 	boolean list = false;
 	
 	@Override
 	void feed(DataInputStream is) throws IOException {
-		if(!list)
-		{
-			int nameSize = 0;
-			nameSize += is.read() << 8;
-			nameSize += is.read();
+		if(!list) {
+			int nameSize = is.readUnsignedShort();
 			byte[] n = new byte[nameSize];
 			try{
 				is.readFully(n);
-				tagName = new String(n, "UTF-8");
-				//System.out.println("read tag named :"+tagName);
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
+				tagName = new String(n, StandardCharsets.UTF_8);
+			} catch(Exception e) { e.printStackTrace(); }
 		}
 	}
 	
@@ -33,8 +26,7 @@ public class NBTNamed extends NBTag{
 		return tagName;
 	}
 
-	public void setNamedFromListIndex(int i)
-	{
+	public void setNamedFromListIndex(int i) {
 		tagName = i+"";
 		list = true;
 	}

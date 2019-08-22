@@ -6,8 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 
-public class NBTFile
-{
+public class NBTFile {
 	private final NBTCompound root;
 	
 	public enum CompressionScheme {
@@ -15,8 +14,7 @@ public class NBTFile
 		GZIPPED,
 	}
 	
-	public NBTFile(File file, CompressionScheme scheme) throws IOException
-	{
+	public NBTFile(File file, CompressionScheme scheme) throws IOException {
 		if(!file.exists())
 			throw new FileNotFoundException(file.getAbsolutePath());
 		
@@ -36,6 +34,10 @@ public class NBTFile
 	public NBTCompound getRoot()
 	{
 		return root;
+	}
+
+	public String getFancyString() {
+		return root.stringifyTag(0);
 	}
 
 }

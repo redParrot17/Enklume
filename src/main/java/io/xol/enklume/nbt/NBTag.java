@@ -7,33 +7,28 @@ import java.io.InputStream;
 /**
  * Clean code is for suckers anyway
  */
-public abstract class NBTag
-{
+public abstract class NBTag {
+
 	abstract void feed(DataInputStream is) throws IOException;
 
-	public static NBTag parseInputStream(InputStream bais)
-	{
-		try
-		{
+	public abstract String stringifyTag(int tabCount);
+
+	public static NBTag parseInputStream(InputStream bais) {
+		try {
 			int type = bais.read();
-			if(type == -1)
-				return null;
+			if(type == -1) return null;
 			NBTag tag = NBTag.create(type);
 			tag.feed(new DataInputStream(bais));
 			return tag;
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			return null;
 		}
 	}
 	
-	public static NBTag createNamedFromList(int t, int listIndex)
-	{
+	public static NBTag createNamedFromList(int t, int listIndex) {
 		NBTag tag = create(Type.values()[t]);
 		
-		if(tag instanceof NBTNamed)
-		{
+		if(tag instanceof NBTNamed) {
 			NBTNamed named = (NBTNamed)tag;
 			named.setNamedFromListIndex(listIndex);
 			
@@ -47,24 +42,19 @@ public abstract class NBTag
 	
 	static Type lastType;
 	
-	public static NBTag create(int t)
-	{
+	public static NBTag create(int t) {
 		try {
 			NBTag tag = create(Type.values()[t]);
 			lastType = Type.values()[t];
-			//System.out.println("found"+lastType);
 			return tag;
-		}
-		catch(ArrayIndexOutOfBoundsException e) {
+		} catch(ArrayIndexOutOfBoundsException e) {
 			System.out.println("Out of bounds type exception: "+t+" Last valid type was : "+lastType);
 			throw new RuntimeException("Well fuck");
 		}
 	}
 
-	private static NBTag create(Type t)
-	{
-		switch (t)
-		{
+	private static NBTag create(Type t) {
+		switch (t) {
 		case TAG_END:
 			return new NBTEnd();
 		case TAG_COMPOUND:
@@ -89,15 +79,18 @@ public abstract class NBTag
 			return new NBTByteArray();
 		case TAG_INT_ARRAY:
 			return new NBTIntArray();
+		case TAG_LONG_ARRAY:
+			return new NBTLongArray();
 		default:
-			System.out.println("Unknow type : " + t.name());
+			System.out.println("Unknown type : " + t.name());
 			break;
 		}
 		return null;
 	}
 
-	public enum Type
-	{
-		TAG_END, TAG_BYTE, TAG_SHORT, TAG_INT, TAG_LONG, TAG_FLOAT, TAG_DOUBLE, TAG_BYTE_ARRAY, TAG_STRING, TAG_LIST, TAG_COMPOUND, TAG_INT_ARRAY;
+	public enum Type {
+		TAG_END, TAG_BYTE, TAG_SHORT, TAG_INT, TAG_LONG,
+		TAG_FLOAT, TAG_DOUBLE, TAG_BYTE_ARRAY, TAG_STRING,
+		TAG_LIST, TAG_COMPOUND, TAG_INT_ARRAY, TAG_LONG_ARRAY
 	}
 }
