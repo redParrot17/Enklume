@@ -21,4 +21,4 @@ Enklume was born out of the need for making the [Chunk Stories](https://chunksto
 
 ### License
 
-It's LGPL. Have your fun, I don't really care, maybe send me a screenshot if you do cool shit with it :)
+It's LGPL. Have your fun, I don't really care, maybe send me a screenshot if you do cool stuff with it :)
